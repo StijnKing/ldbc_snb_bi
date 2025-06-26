@@ -1,0 +1,48 @@
+docker exec --interactive --tty ${AG_CONTAINER_NAME} rm /workspaces/avantgraph/data/snb-bi -r  || true
+
+docker exec --interactive --tty ${AG_CONTAINER_NAME} mkdir /workspaces/avantgraph/data/snb-bi
+
+# Create schema & load data
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-graph /workspaces/avantgraph/data/snb-bi
+
+# Create vertex table
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Comment --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Person --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=firstName=CHAR_STRING --vertex-property=lastName=CHAR_STRING --vertex-property=gender=CHAR_STRING --vertex-property=birthday=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=language=CHAR_STRING --vertex-property=email=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Post --vertex-property=id=CHAR_STRING --vertex-property=imageFile=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Forum --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=title=CHAR_STRING
+
+# Static
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Organisation --vertex-property=id=CHAR_STRING --vertex-property=type=CHAR_STRING --vertex-property=name=CHAR_STRING --vertex-property=url=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Place --vertex-property=id=CHAR_STRING --vertex-property=name=CHAR_STRING --vertex-property=url=CHAR_STRING --vertex-property=type=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=Tag --vertex-property=id=CHAR_STRING --vertex-property=name=CHAR_STRING --vertex-property=url=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-vertex-table /workspaces/avantgraph/data/snb-bi --vertex-label=TagClass --vertex-property=id=CHAR_STRING --vertex-property=name=CHAR_STRING --vertex-property=url=CHAR_STRING
+
+# Create edge tables
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasCreator --src-labels=Comment --trg-labels=Person --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasTag --src-labels=Comment --trg-labels=Tag --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isLocatedIn --src-labels=Comment --trg-labels=Place --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=replyOf --src-labels=Comment --trg-labels=Comment --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=replyOf --src-labels=Comment --trg-labels=Post --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=containerOf --src-labels=Forum --trg-labels=Post --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasMember --src-labels=Forum --trg-labels=Person --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasModerator --src-labels=Forum --trg-labels=Person --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasTag --src-labels=Forum --trg-labels=Tag --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasInterest --src-labels=Person --trg-labels=Tag --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isLocatedIn --src-labels=Person --trg-labels=Place --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=knows --src-labels=Person --trg-labels=Person --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=likes --src-labels=Person --trg-labels=Comment --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=likes --src-labels=Person --trg-labels=Post --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=studyAt --src-labels=Person --trg-labels=Organisation --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=workAt --src-labels=Person --trg-labels=Organisation --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasCreator --src-labels=Post --trg-labels=Person --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasTag --src-labels=Post --trg-labels=Tag --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isLocatedIn --src-labels=Post --trg-labels=Place --edge-property=creationDate=CHAR_STRING
+
+# Static
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isLocatedIn --src-labels=Organisation --trg-labels=Place --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isPartOf --src-labels=Place --trg-labels=Place --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=hasType --src-labels=Tag --trg-labels=TagClass --edge-property=creationDate=CHAR_STRING
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/schema/ag-schema create-edge-table /workspaces/avantgraph/data/snb-bi --edge-label=isSubclassOf --src-labels=TagClass --trg-labels=TagClass --edge-property=creationDate=CHAR_STRING
+
+# Load graph
+docker exec --interactive --tty ${AG_CONTAINER_NAME} /workspaces/avantgraph/build/src/tools/load-graph/ag-load-graph /workspaces/avantgraph/snb-graph.json /workspaces/avantgraph/data/snb-bi --graph-format=json --load-properties
