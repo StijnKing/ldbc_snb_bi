@@ -46,30 +46,9 @@ class BasicRelationship:
             "properties": self.properties
         }
 
-class ReificationNode(BasicNode):
-    def __init__(self):
-        super().__init__()
-        self.reified_nodes = []
-        self.reified_edges = []
-        self.reified_label_sets = []
-        self.reified_properties = []
-
-    def populate_reified_data(self):
-        pass
-
-    def convert(self, data):
-        self.populate_reified_data()
-        data = super().convert(data)
-
-        data["reified_nodes"] = self.reified_nodes
-        data["reified_edges"] = self.reified_edges
-        data["reified_label_sets"] = self.reified_label_sets
-        data["reified_properties"] = self.reified_properties
-
-        return data
 
 # All dynamic convertes
-class CommentConverter(ReificationNode):
+class CommentConverter(BasicNode):
     def __init__(self):
         super().__init__()
         self.labels = ["Comment", "Message"]
@@ -274,7 +253,7 @@ class PersonStudyAtUniversityConverter(BasicRelationship):
         super().__init__()
         self.label = "studyAt"
         self.start["labels"] = PersonConverter().labels
-        self.end["labels"] = OrganisationConverter().labels
+        self.end["labels"] = ["University", "Organisation"]
         self.property_keys = ["creationDate", "classYear"]
 
     def convert(self, data):
@@ -287,7 +266,7 @@ class PersonWorkAtCompanyConverter(BasicRelationship):
         super().__init__()
         self.label = "workAt"
         self.start["labels"] = PersonConverter().labels
-        self.end["labels"] = OrganisationConverter().labels
+        self.end["labels"] = ["Company", "Organisation"]
         self.property_keys = ["creationDate", "workFrom"]
 
     def convert(self, data):
@@ -295,7 +274,7 @@ class PersonWorkAtCompanyConverter(BasicRelationship):
         self.end["id"] = str(data.get('CompanyId'))
         return super().convert(data)
     
-class PostConverter(ReificationNode):
+class PostConverter(BasicNode):
     def __init__(self):
         super().__init__()
         self.labels = ["Post", "Message"]
@@ -347,6 +326,11 @@ class OrganisationConverter(BasicNode):
         self.labels = ["Organisation"]
         self.property_keys = ["type", "name", "url"]
 
+    def convert(self, data):
+        node = super().convert(data)
+        node["labels"] = ["Organisation", data["type"]]
+        return node
+
 class OrganisationIsLocatedInPlaceConverter(BasicRelationship):
     def __init__(self):
         super().__init__()
@@ -358,13 +342,33 @@ class OrganisationIsLocatedInPlaceConverter(BasicRelationship):
     def convert(self, data):
         self.start["id"] = str(data.get('OrganisationId'))
         self.end["id"] = str(data.get('PlaceId'))
+
+        # TODO: Determine if the organisation is a company or university
+        isCompany = True
+        if isCompany:
+            self.start["labels"] = ["Organisation", "Company"]
+            self.end["labels"] = ["Place", "Country"]
+        else:
+            self.start["labels"] = ["Organisation", "University"]
+            self.end["labels"] = ["Place", "City"]
+
         return super().convert(data)
     
 class PlaceConverter(BasicNode):
+    places = {}  # Maps unique ID to "City" or "Country"
+
     def __init__(self):
         super().__init__()
         self.labels = ["Place"]
-        self.property_keys = ["name", "url", "type"]
+        self.property_keys = ["name", "url"]
+
+    def convert(self, data):
+        node = super().convert(data)
+        node["labels"] = ["Place", data["type"]]
+        
+        PlaceConverter.places[str(node["id"])] = data["type"]
+
+        return node
 
 class PlaceIsPartOfPlaceConverter(BasicRelationship):
     def __init__(self):
@@ -375,9 +379,12 @@ class PlaceIsPartOfPlaceConverter(BasicRelationship):
         self.property_keys = []
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PlaceId'))
-        self.end["id"] = str(data.get('PartOfPlaceId'))
-        return super().convert(data)
+        self.start["id"] = str(data.get('Place1Id'))
+        self.end["id"] = str(data.get('Place2Id'))
+        edge = super().convert(data)
+        edge["start"]["labels"] = ["Place", PlaceConverter.places.get(str(data.get('Place1Id')))]
+        edge["end"]["labels"] = ["Place", PlaceConverter.places.get(str(data.get('Place2Id')))]
+        return edge
     
 class TagConverter(BasicNode):
     def __init__(self):
