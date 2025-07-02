@@ -1,5 +1,6 @@
 import os
 import json
+from random import random
 import sys
 
 from populators import PopulatorFactory
@@ -91,7 +92,7 @@ imports = [{
     "layer": "dynamic",
     "name": "Comment_isLocatedIn_Country",
     "converter": CommentIsLocatedInContryConverter(),
-    "outputName": "isLocatedIn"
+    "outputName": "commentisLocatedIn"
 }, {
     "layer": "dynamic",
     "name": "Comment_replyOf_Comment",
@@ -131,7 +132,7 @@ imports = [{
     "layer": "dynamic",
     "name": "Person_isLocatedIn_City",
     "converter": PersonIsLocatedInCityConverter(),
-    "outputName": "isLocatedIn"
+    "outputName": "personisLocatedIn"
 }, {
     "layer": "dynamic",
     "name": "Person_knows_Person",
@@ -171,12 +172,12 @@ imports = [{
     "layer": "dynamic",
     "name": "Post_isLocatedIn_Country",
     "converter": PostIsLocatedInCountryConverter(),
-    "outputName": "isLocatedIn"
+    "outputName": "postisLocatedIn"
 }, {
     "layer": "static",
     "name": "Organisation_isLocatedIn_Place",
     "converter": OrganisationIsLocatedInPlaceConverter(),
-    "outputName": "isLocatedIn"
+    "outputName": "organisationisLocatedIn"
 }, {
     "layer": "static",
     "name": "Place_isPartOf_Place",
@@ -201,6 +202,8 @@ def merge_json_files(input_dir, output_file):
 
     with open(output_file, 'w', encoding='utf-8') as out:
         for root, _, files in os.walk(input_dir):
+            # Sort files to ensure capitalized files are processed first
+            files.sort(key=lambda x: (not x[0].isupper(), x))
             for file in files:
                 if file.endswith('.json'):
                     with open(os.path.join(root, file), 'r', encoding='utf-8') as f:
@@ -220,9 +223,14 @@ def populate_reification_data(working_dir):
             raise FileNotFoundError(f"Input file {input_file} does not exist.")
         
         with open(input_file, 'r', encoding='utf-8') as f:
-            with open(os.path.join(working_dir, 'reified_' + file_name), 'a', encoding='utf-8') as out:
+            with open(os.path.join(working_dir, 'Reified_' + file_name), 'a', encoding='utf-8') as out:
                 for line in f:
                     original = json.loads(line.strip())
+                    # 25% chance to select random entries
+                    if random() > 0.25:
+                        out.write(json.dumps(original, ensure_ascii=False) + '\n')
+                        continue
+
                     data = populator.generate_data()
                     original['reified_nodes'] = data.nodes
                     original['reified_edges'] = data.edges
@@ -245,10 +253,6 @@ def convert_json_file(input_file, output_file, converter):
     if not os.path.exists(input_file):
         print(f"Input file {input_file} does not exist.")
         return
-    
-    # Clean output file if exists
-    if os.path.exists(output_file):
-        os.remove(output_file)
 
     print(f"Converting {input_file} to {output_file}")
     with open(output_file, 'w', encoding='utf-8') as out:
@@ -276,6 +280,13 @@ def convert_all_json_files(input_dir, output_dir):
         os.makedirs(output_dir)
 
     output_folder = os.path.join(output_dir)
+
+    # Clear all files except .gitignore in the output folder
+    for file in os.listdir(output_folder):
+        if file != '.gitignore':
+            file_path = os.path.join(output_folder, file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
     for object in imports:
         root = object['layer']

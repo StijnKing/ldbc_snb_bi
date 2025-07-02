@@ -13,7 +13,7 @@ class BasicNode:
 
         return {
             "type": "node",
-            "id": str(self.id),
+            "id": self.__class__.id_prefix + str(self.id),
             "labels": self.labels,
             "properties": self.properties
         }
@@ -49,6 +49,8 @@ class BasicRelationship:
 
 # All dynamic convertes
 class CommentConverter(BasicNode):
+    id_prefix = ""
+
     def __init__(self):
         super().__init__()
         self.labels = ["Comment", "Message"]
@@ -63,8 +65,8 @@ class CommentHasCreatorPersonConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('CommentId'))
-        self.end["id"] = str(data.get('PersonId'))
+        self.start["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
+        self.end["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
         return super().convert(data)
 
 class CommentHasTagConverter(BasicRelationship):
@@ -76,8 +78,8 @@ class CommentHasTagConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('CommentId'))
-        self.end["id"] = str(data.get('TagId'))
+        self.start["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
+        self.end["id"] = TagConverter.id_prefix + str(data.get('TagId'))
         return super().convert(data)
 
 class CommentIsLocatedInContryConverter(BasicRelationship):
@@ -85,12 +87,12 @@ class CommentIsLocatedInContryConverter(BasicRelationship):
         super().__init__()
         self.label = "isLocatedIn"
         self.start["labels"] = CommentConverter().labels
-        self.end["labels"] = PlaceConverter().labels
+        self.end["labels"] = ["Place", "Country"]
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('CommentId'))
-        self.end["id"] = str(data.get('CountryId'))
+        self.start["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
+        self.end["id"] = PlaceConverter.id_prefix + str(data.get('CountryId'))
         return super().convert(data)
 
 class CommentReplyOfCommentConverter(BasicRelationship):
@@ -102,8 +104,8 @@ class CommentReplyOfCommentConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
     
     def convert(self, data):
-        self.start["id"] = str(data.get('CommentId'))
-        self.end["id"] = str(data.get('ReplyOfCommentId'))
+        self.start["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
+        self.end["id"] = CommentConverter.id_prefix + str(data.get('ReplyOfCommentId'))
         return super().convert(data)
     
 class CommentReplyOfPostConverter(BasicRelationship):
@@ -115,11 +117,13 @@ class CommentReplyOfPostConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('CommentId'))
-        self.end["id"] = str(data.get('PostId'))
+        self.start["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
+        self.end["id"] = PostConverter.id_prefix + str(data.get('PostId'))
         return super().convert(data)
     
 class ForumConverter(BasicNode):
+    id_prefix = "forum"
+
     def __init__(self):
         super().__init__()
         self.labels = ["Forum"]
@@ -134,8 +138,8 @@ class ForumContainerOfPostConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('ForumId'))
-        self.end["id"] = str(data.get('PostId'))
+        self.start["id"] = ForumConverter.id_prefix + str(data.get('ForumId'))
+        self.end["id"] = PostConverter.id_prefix + str(data.get('PostId'))
         return super().convert(data)
     
 class ForumHasMemberPersonConverter(BasicRelationship):
@@ -147,8 +151,8 @@ class ForumHasMemberPersonConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('ForumId'))
-        self.end["id"] = str(data.get('PersonId'))
+        self.start["id"] = ForumConverter.id_prefix + str(data.get('ForumId'))
+        self.end["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
         return super().convert(data)
     
 class ForumHasModeratorPersonConverter(BasicRelationship):
@@ -160,8 +164,8 @@ class ForumHasModeratorPersonConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('ForumId'))
-        self.end["id"] = str(data.get('PersonId'))
+        self.start["id"] = ForumConverter.id_prefix + str(data.get('ForumId'))
+        self.end["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
         return super().convert(data)
     
 class ForumHasTagConverter(BasicRelationship):
@@ -173,11 +177,13 @@ class ForumHasTagConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('ForumId'))
-        self.end["id"] = str(data.get('TagId'))
+        self.start["id"] = ForumConverter.id_prefix + str(data.get('ForumId'))
+        self.end["id"] = TagConverter.id_prefix + str(data.get('TagId'))
         return super().convert(data)
 
 class PersonConverter(BasicNode):
+    id_prefix = "person"
+
     def __init__(self):
         super().__init__()
         self.labels = ["Person"]
@@ -192,8 +198,8 @@ class PersonHasInterestTagConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('TagId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = TagConverter.id_prefix + str(data.get('TagId'))
         return super().convert(data)
     
 class PersonIsLocatedInCityConverter(BasicRelationship):
@@ -201,12 +207,12 @@ class PersonIsLocatedInCityConverter(BasicRelationship):
         super().__init__()
         self.label = "isLocatedIn"
         self.start["labels"] = PersonConverter().labels
-        self.end["labels"] = PlaceConverter().labels
+        self.end["labels"] = ["Place", "City"]
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('CityId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = PlaceConverter.id_prefix + str(data.get('CityId'))
         return super().convert(data)
     
 class PersonKnowsPersonConverter(BasicRelationship):
@@ -218,8 +224,8 @@ class PersonKnowsPersonConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('KnowsPersonId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('Person1Id'))
+        self.end["id"] = PersonConverter.id_prefix + str(data.get('Person2Id'))
         return super().convert(data)
     
 class PersonLikesCommentConverter(BasicRelationship):
@@ -231,8 +237,8 @@ class PersonLikesCommentConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('CommentId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = CommentConverter.id_prefix + str(data.get('CommentId'))
         return super().convert(data)
     
 class PersonLikesPostConverter(BasicRelationship):
@@ -244,8 +250,8 @@ class PersonLikesPostConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
         
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('PostId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = PostConverter.id_prefix + str(data.get('PostId'))
         return super().convert(data)
     
 class PersonStudyAtUniversityConverter(BasicRelationship):
@@ -257,8 +263,8 @@ class PersonStudyAtUniversityConverter(BasicRelationship):
         self.property_keys = ["creationDate", "classYear"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('UniversityId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = OrganisationConverter.id_prefix + str(data.get('UniversityId'))
         return super().convert(data)
     
 class PersonWorkAtCompanyConverter(BasicRelationship):
@@ -270,11 +276,13 @@ class PersonWorkAtCompanyConverter(BasicRelationship):
         self.property_keys = ["creationDate", "workFrom"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PersonId'))
-        self.end["id"] = str(data.get('CompanyId'))
+        self.start["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
+        self.end["id"] = OrganisationConverter.id_prefix + str(data.get('CompanyId'))
         return super().convert(data)
     
 class PostConverter(BasicNode):
+    id_prefix = ""
+
     def __init__(self):
         super().__init__()
         self.labels = ["Post", "Message"]
@@ -289,8 +297,8 @@ class PostHasCreatorPersonConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PostId'))
-        self.end["id"] = str(data.get('PersonId'))
+        self.start["id"] = PostConverter.id_prefix + str(data.get('PostId'))
+        self.end["id"] = PersonConverter.id_prefix + str(data.get('PersonId'))
         return super().convert(data)
     
 class PostHasTagConverter(BasicRelationship):
@@ -302,8 +310,8 @@ class PostHasTagConverter(BasicRelationship):
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PostId'))
-        self.end["id"] = str(data.get('TagId'))
+        self.start["id"] = PostConverter.id_prefix + str(data.get('PostId'))
+        self.end["id"] = TagConverter.id_prefix + str(data.get('TagId'))
         return super().convert(data)
     
 class PostIsLocatedInCountryConverter(BasicRelationship):
@@ -311,41 +319,46 @@ class PostIsLocatedInCountryConverter(BasicRelationship):
         super().__init__()
         self.label = "isLocatedIn"
         self.start["labels"] = PostConverter().labels
-        self.end["labels"] = PlaceConverter().labels
+        self.end["labels"] = ["Place", "Country"]
         self.property_keys = ["creationDate"]
 
     def convert(self, data):
-        self.start["id"] = str(data.get('PostId'))
-        self.end["id"] = str(data.get('CountryId'))
+        self.start["id"] = PostConverter.id_prefix + str(data.get('PostId'))
+        self.end["id"] = PlaceConverter.id_prefix + str(data.get('CountryId'))
         return super().convert(data)
 
 # Additional static convertes
 class OrganisationConverter(BasicNode):
+    id_prefix = "organisation"
+    mapping = {}  # Maps unique ID to "Company" or "University"
+
     def __init__(self):
         super().__init__()
         self.labels = ["Organisation"]
-        self.property_keys = ["type", "name", "url"]
+        self.property_keys = ["name", "url"]
 
     def convert(self, data):
         node = super().convert(data)
         node["labels"] = ["Organisation", data["type"]]
+        OrganisationConverter.mapping[str(node["id"])] = data["type"]
         return node
 
 class OrganisationIsLocatedInPlaceConverter(BasicRelationship):
     def __init__(self):
         super().__init__()
         self.label = "isLocatedIn"
-        self.start["labels"] = OrganisationConverter().labels
-        self.end["labels"] = PlaceConverter().labels
+        self.start["labels"] = None
+        self.end["labels"] = None
         self.property_keys = []
 
     def convert(self, data):
-        self.start["id"] = str(data.get('OrganisationId'))
-        self.end["id"] = str(data.get('PlaceId'))
+        self.start["id"] = OrganisationConverter.id_prefix + str(data.get('OrganisationId'))
+        self.end["id"] = PlaceConverter.id_prefix + str(data.get('PlaceId'))
 
-        # TODO: Determine if the organisation is a company or university
-        isCompany = True
-        if isCompany:
+        type = OrganisationConverter.mapping.get(OrganisationConverter.id_prefix + str(data.get('OrganisationId')))
+        assert type is not None, "Organisation type not found in mapping."
+
+        if type == "Company":
             self.start["labels"] = ["Organisation", "Company"]
             self.end["labels"] = ["Place", "Country"]
         else:
@@ -355,6 +368,7 @@ class OrganisationIsLocatedInPlaceConverter(BasicRelationship):
         return super().convert(data)
     
 class PlaceConverter(BasicNode):
+    id_prefix = "place"
     places = {}  # Maps unique ID to "City" or "Country"
 
     def __init__(self):
@@ -374,19 +388,21 @@ class PlaceIsPartOfPlaceConverter(BasicRelationship):
     def __init__(self):
         super().__init__()
         self.label = "isPartOf"
-        self.start["labels"] = PlaceConverter().labels
-        self.end["labels"] = PlaceConverter().labels
+        self.start["labels"] = None
+        self.end["labels"] = None
         self.property_keys = []
 
     def convert(self, data):
-        self.start["id"] = str(data.get('Place1Id'))
-        self.end["id"] = str(data.get('Place2Id'))
+        self.start["id"] = PlaceConverter.id_prefix + str(data.get('Place1Id'))
+        self.end["id"] = PlaceConverter.id_prefix + str(data.get('Place2Id'))
         edge = super().convert(data)
-        edge["start"]["labels"] = ["Place", PlaceConverter.places.get(str(data.get('Place1Id')))]
-        edge["end"]["labels"] = ["Place", PlaceConverter.places.get(str(data.get('Place2Id')))]
+        edge["start"]["labels"] = ["Place", PlaceConverter.places.get(PlaceConverter.id_prefix + str(data.get('Place1Id')))]
+        edge["end"]["labels"] = ["Place", PlaceConverter.places.get(PlaceConverter.id_prefix + str(data.get('Place2Id')))]
         return edge
     
 class TagConverter(BasicNode):
+    id_prefix = "tag"
+
     def __init__(self):
         super().__init__()
         self.labels = ["Tag"]
@@ -401,11 +417,13 @@ class TagHasTypeTagClassConverter(BasicRelationship):
         self.property_keys = []
 
     def convert(self, data):
-        self.start["id"] = str(data.get('TagId'))
-        self.end["id"] = str(data.get('TagClassId'))
+        self.start["id"] = TagConverter.id_prefix + str(data.get('TagId'))
+        self.end["id"] = TagClassConverter.id_prefix + str(data.get('TagClassId'))
         return super().convert(data)
     
 class TagClassConverter(BasicNode):
+    id_prefix = "tagclass"
+
     def __init__(self):
         super().__init__()
         self.labels = ["TagClass"]
@@ -420,6 +438,6 @@ class TagClassIsSubclassOfTagClassConverter(BasicRelationship):
         self.property_keys = []
 
     def convert(self, data):
-        self.start["id"] = str(data.get('TagClass1Id'))
-        self.end["id"] = str(data.get('TagClass2Id'))
+        self.start["id"] = TagClassConverter.id_prefix + str(data.get('TagClass1Id'))
+        self.end["id"] = TagClassConverter.id_prefix + str(data.get('TagClass2Id'))
         return super().convert(data)

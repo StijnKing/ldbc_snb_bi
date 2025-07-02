@@ -17,13 +17,11 @@ class Populator:
         self.data_file = data_file
         self.entries = []
 
-    def populate(self):        
-        # Check if the file exists
+    def populate(self):
         if not os.path.exists(self.data_file):
             print(f"Data file {self.data_file} does not exist.")
             return
         
-        # Read the person data
         with open(self.data_file, 'r') as f:
             for line in f:
                 entry = json.loads(line.strip())
@@ -82,7 +80,11 @@ class EdgePopulator(Populator):
         data.edges.extend([{"id": entry['id']} for entry in selected_edges])
 
         # Select about 25% of the nodes
-        nodes = { entry['source_id'] for entry in selected_edges }.union({ entry['target_id'] for entry in selected_edges })
+        nodes = set()
+        for entry in selected_edges:
+            nodes.add(entry['source_id'])
+            nodes.add(entry['target_id'])
+
         node_ids = random.sample(list(nodes), min(len(nodes), round(len(nodes) * 0.25)))
         
         # Convert nodes to a list of dictionaries
@@ -107,7 +109,7 @@ class PopulatorFactory:
             data_file = os.path.join(input_dir, node)
             p.register_populator(name, Populator(data_file).populate())
 
-        edges = ["knows.json"]
+        edges = ["knows.json", "organisationisLocatedIn.json"]
         for edge in edges:
             name = edge.split('.')[0]
             data_file = os.path.join(input_dir, edge)
