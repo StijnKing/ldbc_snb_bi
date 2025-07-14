@@ -9,7 +9,10 @@ class BasicNode:
         self.id = data.get('id')
         for key in self.property_keys:
             if key in data:
-                self.properties[key] = str(data[key])
+                if key == 'length':
+                    self.properties[key] = int(data[key])
+                else:
+                    self.properties[key] = str(data[key])
 
         return {
             "type": "node",
