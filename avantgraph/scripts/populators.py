@@ -91,6 +91,39 @@ class EdgePopulator(Populator):
         data.nodes.extend([{'id': node_id} for node_id in node_ids])
         
         return data
+
+class LabelSetPopulator(Populator):
+    def __init__(self, data_file, type: str = "node"):
+        self.type = type
+        super().__init__(data_file)
+
+    def _append_entry(self, entry):
+        """
+        Append a single entry to the entries list with tags.
+        """
+        label_set_entry = {
+            "id": str(entry['id']),
+            "type": self.type,
+        }
+        self.entries.append(label_set_entry)
+        
+    def select_random_entries(self, data, count=1):
+        """
+        Select a random sample of label sets from the populated data. A label set is either
+        a reference to a node or to an edge in the format:
+        {
+            "type": "node" or "edge",
+            "id": "node_id" or "edge_id",
+        }
+        """
+        if not self.entries:
+            print("No entries to select from in: {}.".format(self.__class__.__name__))
+            return []
+        
+        count = round(random.randint(1, count))
+        # data.label_sets.extend(random.sample(self.entries, min(count, len(self.entries))))
+        
+        return data
     
 class PopulatorFactory:
     def __init__(self):
@@ -114,6 +147,18 @@ class PopulatorFactory:
             name = edge.split('.')[0]
             data_file = os.path.join(input_dir, edge)
             p.register_populator(name, EdgePopulator(data_file).populate())
+
+        label_sets = ["Organisation.json"]
+        for label_set in label_sets:
+            name = label_set.split('.')[0]
+            data_file = os.path.join(input_dir, label_set)
+            p.register_populator(name, LabelSetPopulator(data_file, type="node").populate())
+
+        label_sets_edges = ["replyOf.json"]
+        for label_set in label_sets_edges:
+            name = label_set.split('.')[0]
+            data_file = os.path.join(input_dir, label_set)
+            p.register_populator(name, LabelSetPopulator(data_file, type="relationship").populate())
 
         return p
     
@@ -142,5 +187,14 @@ class PopulatorFactory:
                 data.edges.extend(random_entries.edges)
                 data.label_sets.extend(random_entries.label_sets)
                 data.properties.extend(random_entries.properties)
+
+        # Clean duplicates from nodes, edges, label_sets, and properties
+        seen = set()
+        data.nodes = [node for node in data.nodes if not (node['id'] in seen or seen.add(node['id']))]
+        seen = set()
+        data.edges = [edge for edge in data.edges if not (edge['id'] in seen or seen.add(edge['id']))]
+        seen = set()
+        data.label_sets = [label_set for label_set in data.label_sets if not (label_set['id'] + label_set["type"] in seen or seen.add(label_set['id'] + label_set["type"]))]
+        # TODO: handle label_sets and properties once they are implemented
 
         return data
