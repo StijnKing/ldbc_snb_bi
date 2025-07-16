@@ -91,7 +91,7 @@ def run_queries(query_variants, session, sf, batch_id, batch_type, test, pgtunin
         query_subvariant = re.sub("[^ab]", "", query_variant)
 
         print(f"========================= Q {query_num:02d}{query_subvariant.rjust(1)} =========================")
-        query_file = open(f'queries/bi-{query_num}.cypher', 'r')
+        query_file = open(f'queries/mpg-{query_num}.cypher', 'r')
         query_spec = query_file.read()
         query_file.close()
 
