@@ -14,7 +14,7 @@ import argparse
 if __name__ == '__main__':
     query_variants = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 
-    driver = neo4j.GraphDatabase.driver("bolt://100.80.112.8:7687")
+    driver = neo4j.GraphDatabase.driver("bolt://localhost:7687")
     session = driver.session()
 
     parser = argparse.ArgumentParser()

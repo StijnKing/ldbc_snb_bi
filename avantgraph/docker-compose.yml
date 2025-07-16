@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  avantgraph:
+    container_name: avantgraph
+    image: git.avantgraph.io:5050/ag/ci-image/devcontainer:master
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - SYS_PTRACE
+    ports:
+      - "7687:7687"
+    volumes:
+      - ../../avantgraph:/workspaces/avantgraph
+    command: >
+      sh -c "workspaces/avantgraph/build-release/src/tools/server/ag-server --listen=0.0.0.0:7687 /workspaces/avantgraph/data/snb-bi"
+    working_dir: /
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 16G

@@ -246,31 +246,39 @@ def populate_reification_data(working_dir):
         else:
             print(f"Input file {input_file} does not exist, skipping removal.")
 
-def convert_json_file(input_file, output_file, converter):
+def convert_json_file(files, output_file, converter):
     """
     Convert a single JSON file using the specified converter.
     """
-    if not os.path.exists(input_file):
-        print(f"Input file {input_file} does not exist.")
-        return
-
-    print(f"Converting {input_file} to {output_file}")
     with open(output_file, 'w', encoding='utf-8') as out:
-        with open(input_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                original = json.loads(line.strip())
-                converted = converter.convert(original)
-                out.write(json.dumps(converted, ensure_ascii=False) + '\n')
+        for file in files:
+            print(f"Converting {file} to {output_file}")
+            if not os.path.exists(file):
+                print(f"Input file {file} does not exist.")
+                return
 
-def find_json_file(input_dir):
+            with open(file, 'r', encoding='utf-8') as f:
+                print(f"Processing file: {file}")
+                # Skip empty files
+                if os.stat(file).st_size == 0:
+                    print(f"File {file} is empty, skipping.")
+                    continue
+
+                for line in f:
+                    original = json.loads(line.strip())
+                    converted = converter.convert(original)
+                    out.write(json.dumps(converted, ensure_ascii=False) + '\n')
+
+def find_json_files(input_dir):
     """
     Find the json file in the input directory.
     """
+    json_files = []
     for root, _, files in os.walk(input_dir):
         for file in files:
             if file.endswith('.json'):
-                return os.path.join(root, file)
-    raise FileNotFoundError(f"No JSON file found in {input_dir}.")
+                json_files.append(os.path.join(root, file))
+    return json_files
 
 def convert_all_json_files(input_dir, output_dir):
     """
@@ -303,8 +311,8 @@ def convert_all_json_files(input_dir, output_dir):
             continue
 
         converter = object['converter']
-        file_path = find_json_file(input_folder)
-        convert_json_file(file_path, output_file, converter)
+        files = find_json_files(input_folder)
+        convert_json_file(files, output_file, converter)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
