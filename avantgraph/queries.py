@@ -96,7 +96,7 @@ def run_queries(query_variants, session, sf, batch_id, batch_type, test, pgtunin
         query_file.close()
 
         i = 0
-        for a in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
+        for a in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]:
             i = i + 1
 
             (results, duration) = run_query(session, query_num, query_variant, query_spec, test)
