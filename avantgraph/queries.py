@@ -96,7 +96,7 @@ def run_queries(query_variants, session, sf, batch_id, batch_type, test, pgtunin
         query_file.close()
 
         i = 0
-        for a in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]:
+        while True:
             i = i + 1
 
             (results, duration) = run_query(session, query_num, query_variant, query_spec, test)
@@ -113,23 +113,3 @@ def run_queries(query_variants, session, sf, batch_id, batch_type, test, pgtunin
                 break
 
     return time.time() - start
-
-
-def run_precomputations(sf, query_variants, session, batch_date, batch_type, timings_file):
-    if "19a" in query_variants or "19b" in query_variants:
-        start = time.time()
-        print("Creating graph (precomputing weights) for Q19")
-        session.write_transaction(write_query_fun, open(f'queries/bi-19-drop-graph.cypher', 'r').read())
-        session.write_transaction(write_query_fun, open(f'queries/bi-19-create-graph.cypher', 'r').read())
-        end = time.time()
-        duration = end - start
-        timings_file.write(f"Neo4j|{sf}|{batch_date}|{batch_type}|q19precomputation||{duration}\n")
-
-    if "20a" in query_variants or "20b" in query_variants:
-        start = time.time()
-        print("Creating graph (precomputing weights) for Q20")
-        session.write_transaction(write_query_fun, open(f'queries/bi-20-drop-graph.cypher', 'r').read())
-        session.write_transaction(write_query_fun, open(f'queries/bi-20-create-graph.cypher', 'r').read())
-        end = time.time()
-        duration = end - start
-        timings_file.write(f"Neo4j|{sf}|{batch_date}|{batch_type}|q20precomputation||{duration}\n")

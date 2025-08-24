@@ -1,13 +1,10 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import time
-import os
-import csv
 import datetime
 import neo4j
-from queries import run_queries, run_precomputations
+from queries import run_queries, run_query
 from pathlib import Path
-from itertools import cycle
 import argparse
 
 
@@ -41,10 +38,15 @@ if __name__ == '__main__':
     batch_size = relativedelta(days=1)
     batch_date = network_start_date
 
+    # Run a single query beforehand
+    query_file = open(f'queries/mpg-1.cypher', 'r')
+    query_spec = query_file.read()
+    query_file.close()
+    run_query(session, 1, "1", query_spec, test)
+
     benchmark_start = time.time()
 
     batch_type = "power"
-    run_precomputations(sf, query_variants, session, batch_date, batch_type, timings_file)
     reads_time = run_queries(query_variants, session, sf, batch_date, batch_type, test, pgtuning, timings_file, results_file)
 
     benchmark_end = time.time()
