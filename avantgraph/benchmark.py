@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     results_file = open(f"output/output-sf{sf}/results.csv", "a")
     timings_file = open(f"output/output-sf{sf}/timings.csv", "a")
-    timings_file.write(f"tool|sf|day|batch_type|q|parameters|time\n")
+    timings_file.write(f"tool|sf|day|batch_type|q|time\n")
 
     network_start_date = datetime.date(2012, 11, 29)
     network_end_date = datetime.date(2013, 1, 1)

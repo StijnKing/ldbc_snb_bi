@@ -227,7 +227,8 @@ def populate_reification_data(working_dir):
                 for line in f:
                     original = json.loads(line.strip())
                     # 25% chance to select random entries
-                    if random() > 0.25:
+                    NODE_REIFICATION_CHANCE = float(os.environ.get("NODE_REIFICATION_CHANCE", 0.25))
+                    if random() > NODE_REIFICATION_CHANCE:
                         out.write(json.dumps(original, ensure_ascii=False) + '\n')
                         continue
 

@@ -3,6 +3,10 @@ import json
 import os
 import random
 
+POPULATOR_AMOUNT = int(os.environ.get("POPULATOR_AMOUNT", 10))
+POPULATOR_CHANCE = float(os.environ.get("POPULATOR_CHANCE", 0.1))
+POPULATOR_SRC_TRG_CHANCE = 0.25  # fixed, not varied
+
 
 class ReifiedData:
     def __init__(self):
@@ -85,8 +89,8 @@ class EdgePopulator(Populator):
             nodes.add(entry['source_id'])
             nodes.add(entry['target_id'])
 
-        node_ids = random.sample(list(nodes), min(len(nodes), round(len(nodes) * 0.25)))
-        
+        node_ids = random.sample(list(nodes), min(len(nodes), round(len(nodes) * POPULATOR_SRC_TRG_CHANCE)))
+
         # Convert nodes to a list of dictionaries
         data.nodes.extend([{'id': node_id} for node_id in node_ids])
         
@@ -221,10 +225,10 @@ class PopulatorFactory:
         data = ReifiedData()
         for _, populator in self.populators.items():
             # 10% chance to select random entries
-            if random.random() > 0.1:
+            if random.random() > POPULATOR_CHANCE:
                 continue
-            
-            random_entries = populator.select_random_entries(data, 10)
+
+            random_entries = populator.select_random_entries(data, POPULATOR_AMOUNT)
             if random_entries:
                 data.nodes.extend(random_entries.nodes)
                 data.edges.extend(random_entries.edges)
