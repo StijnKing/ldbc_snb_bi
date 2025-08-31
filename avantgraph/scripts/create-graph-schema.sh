@@ -8,9 +8,9 @@ mkdir /data/snb-bi
 ag-schema create-graph /data/snb-bi
 
 # Create vertex table
-ag-schema create-vertex-table /data/snb-bi --vertex-label=Comment --vertex-label=Message --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=U64 --add-reification
+ag-schema create-vertex-table /data/snb-bi --vertex-label=Comment --vertex-label=Message --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=S64 --add-reification
 ag-schema create-vertex-table /data/snb-bi --vertex-label=Person --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=firstName=CHAR_STRING --vertex-property=lastName=CHAR_STRING --vertex-property=gender=CHAR_STRING --vertex-property=birthday=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=language=CHAR_STRING --vertex-property=email=CHAR_STRING
-ag-schema create-vertex-table /data/snb-bi --vertex-label=Post --vertex-label=Message --vertex-property=id=CHAR_STRING --vertex-property=imageFile=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=U64 --add-reification
+ag-schema create-vertex-table /data/snb-bi --vertex-label=Post --vertex-label=Message --vertex-property=id=CHAR_STRING --vertex-property=imageFile=CHAR_STRING --vertex-property=locationIP=CHAR_STRING --vertex-property=browserUsed=CHAR_STRING --vertex-property=content=CHAR_STRING --vertex-property=length=S64 --add-reification
 ag-schema create-vertex-table /data/snb-bi --vertex-label=Forum --vertex-property=id=CHAR_STRING --vertex-property=creationDate=CHAR_STRING --vertex-property=title=CHAR_STRING
 
 # Static
