@@ -3,11 +3,19 @@ set -e
 
 # Set default container image if not provided
 AG_IMAGE=${AG_IMAGE:-stijnking/avantgraph-mpg:latest}
+LOAD_TIMES_OUTPUT_NAME="scalefactor_load_times.csv"
 OUTPUT_FILE_NAME="scalefactor_query_times.csv"
 
 echo "Using AvantGraph image: ${AG_IMAGE}"
+
+# Clear output files if they exist
+> ./data/${LOAD_TIMES_OUTPUT_NAME}
+> ./data/${OUTPUT_FILE_NAME}
+
 # Setup headers for CSV output
+echo "scale_factor,max_size,node_fraction,type_fraction,load_time_seconds,iteration" > ./data/${LOAD_TIMES_OUTPUT_NAME}
 echo "scale_factor,max_size,node_fraction,type_fraction,query_number,run_time_seconds,iteration" > ./data/${OUTPUT_FILE_NAME}
+
 # Represents (scale_factor, max_size, node_fraction, type_fraction)
 for scale_factor in "0.003" "0.1" "0.3" "1"
 do
