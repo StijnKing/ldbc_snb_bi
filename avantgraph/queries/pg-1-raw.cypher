@@ -1,0 +1,7 @@
+MATCH (n)
+WHERE 'Message' IN LABELS(n)
+RETURN LABELS(n)
+UNION
+MATCH ()-[r]->()
+WHERE 'Message' IN LABELS(r)
+RETURN LABELS(r);
